@@ -10,7 +10,7 @@ async function registerController(req, res) {
   });
   if (isUserAlreadyExists) {
     return res.status(409).json({
-      message: `User already exists ${isUserAlreadyExists === email ? "with email" : "with username"}`,
+      message: `User already exists ${isUserAlreadyExists.email === email ? "with this email" : "with this username"}`,
     });
   }
 
@@ -26,6 +26,7 @@ async function registerController(req, res) {
   const token = jwt.sign(
     {
       id: user._id,
+      username: user.username,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" },
@@ -62,6 +63,7 @@ async function loginController(req, res) {
   const token = jwt.sign(
     {
       id: user._id,
+      username: user.username,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" },
