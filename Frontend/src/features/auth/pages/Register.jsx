@@ -1,70 +1,78 @@
-import "../style/form.scss";
-import { Link } from "react-router";
-import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router";
+import { Link } from "react-router";
+import { useState } from "react";
+import "../style/form.scss";
 
 const Register = () => {
+  const { loading, handleRegister } = useAuth();
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
-  const { handleRegister, loading } = useAuth();
   const navigate = useNavigate();
 
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
-
-  function handleFormSubmit(event) {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const { username, email, password } = formData;
-    handleRegister(username, email, password).then((res) => {
-      console.log(res);
-      navigate("/");
-    });
-  }
 
-  function handleChange(event) {
+    const { username, email, password } = formData;
+    await handleRegister(username, email, password);
+    console.log("User registered");
+
+    navigate("/");
+  };
+
+  const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  if (loading) {
+    return (
+      <main>
+        <h1>Loading...</h1>
+      </main>
+    );
   }
 
   return (
     <main>
       <div className="form-container">
         <h1>Register</h1>
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleSubmit}>
           <input
-            onChange={handleChange}
+            onChange={handleInputChange}
             value={formData.username}
             type="text"
             name="username"
+            id="username"
             placeholder="Enter username"
           />
           <input
-            onChange={handleChange}
+            onChange={handleInputChange}
             value={formData.email}
             type="email"
             name="email"
-            placeholder="Enter email"
+            id="email"
+            placeholder="Enter email address"
           />
           <input
-            onChange={handleChange}
+            onChange={handleInputChange}
             value={formData.password}
             type="password"
             name="password"
+            id="password"
             placeholder="Enter password"
           />
-          <button type="submit">Register</button>
+          <button className="button primary-button" type="submit">
+            Register
+          </button>
         </form>
 
         <p>
-          Already have an account?{" "}
-          <Link className="toggle-auth-form" to="/login">
-            Login
-          </Link>
+          Already have an account? <Link to={"/login"}>Login to account.</Link>
         </p>
       </div>
     </main>

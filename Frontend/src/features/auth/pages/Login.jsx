@@ -1,59 +1,66 @@
-import "../style/form.scss";
-import { Link } from "react-router";
-import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router";
+import { Link } from "react-router";
+import { useState } from "react";
+import "../style/form.scss";
 
 const Login = () => {
-  const [formData, setformData] = useState({ username: "", password: "" });
-  const { handleLogin, loading } = useAuth();
+  const { loading, handleLogin } = useAuth();
+
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
 
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
-
-  function handleFormSubmit(event) {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const { username, password } = formData;
-    handleLogin(username, password).then((res) => {
-      console.log(res);
-      navigate("/");
-    });
-  }
 
-  function handleChange(event) {
+    const { username, password } = formData;
+    await handleLogin(username, password);
+    console.log("User loggedIn");
+
+    navigate("/");
+  };
+
+  const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setformData({ ...formData, [name]: value });
+    setFormData({ ...formData, [name]: value });
+  };
+
+  if (loading) {
+    return (
+      <main>
+        <h1>Loading...</h1>
+      </main>
+    );
   }
 
   return (
     <main>
       <div className="form-container">
         <h1>Login</h1>
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleSubmit}>
           <input
-            onChange={handleChange}
+            onChange={handleInputChange}
             value={formData.username}
             type="text"
             name="username"
+            id="username"
             placeholder="Enter username"
           />
           <input
-            onChange={handleChange}
+            onChange={handleInputChange}
             value={formData.password}
             type="password"
             name="password"
+            id="password"
             placeholder="Enter password"
           />
-          <button type="submit">Login</button>
+          <button className="button primary-button" type="submit">
+            Login
+          </button>
         </form>
 
         <p>
-          Don't have an account?{" "}
-          <Link className="toggle-auth-form" to="/register">
-            Register
-          </Link>
+          Don't have an account? <Link to={"/register"}>Create One.</Link>
         </p>
       </div>
     </main>
