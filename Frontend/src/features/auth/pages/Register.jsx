@@ -1,7 +1,8 @@
 import "../style/form.scss";
 import { Link } from "react-router";
 import { useState } from "react";
-import axios from "axios";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -9,29 +10,25 @@ const Register = () => {
     email: "",
     password: "",
   });
+  const { handleRegister, loading } = useAuth();
+  const navigate = useNavigate();
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const { username, email, password } = formData;
+    handleRegister(username, email, password).then((res) => {
+      console.log(res);
+      navigate("/");
+    });
+  }
 
   function handleChange(event) {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
-  }
-
-  async function handleFormSubmit(event) {
-    event.preventDefault();
-    const { username, email, password } = formData;
-
-    axios
-      .post(
-        "http://localhost:3000/api/auth/register",
-        {
-          username,
-          email,
-          password,
-        },
-        { withCredentials: true },
-      )
-      .then((res) => {
-        console.log(res.data);
-      });
   }
 
   return (
