@@ -47,14 +47,17 @@ async function registerController(req, res) {
 async function loginController(req, res) {
   const { email, username, password } = req.body;
 
-  const user = await userModel.findOne({
-    $or: [{ username: username }, { email: email }],
-  });
+  const user = await userModel
+    .findOne({
+      $or: [{ username: username }, { email: email }],
+    })
+    .select("+password");
 
   if (!user) {
     return res.status(404).json({ message: "User doesn't exists" });
   }
 
+  console.log(user);
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     return res.status(401).json({ message: "Password invalid" });
